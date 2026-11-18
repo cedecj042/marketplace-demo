@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Marketplace Demo
 
-## Getting Started
+A minimalist local marketplace built with Next.js, React, TypeScript, Tailwind CSS, and Supabase. It supports browsing and searching live listings, category filters, image uploads, item details, and seller messaging.
 
-First, run the development server:
+## Technology
+
+- Next.js 16.4 with App Router and Cache Components
+- React 19 and TypeScript
+- Tailwind CSS 4
+- Supabase Database and Storage
+- Base UI/Shadcn-style primitives
+- IBM Plex Sans through `next/font`
+- Lucide icons
+
+## Quick start
 
 ```bash
+npm install
+cp .env.example .env.local
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Add your Supabase project URL and publishable key to `.env.local`, then open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+See [SETUP.md](./SETUP.md) for database, storage, and deployment instructions.
 
-## Learn More
+## Commands
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run dev        # Local development
+npm run lint       # ESLint
+npm run typecheck  # TypeScript validation
+npm run build      # Production build
+npm run check      # Full verification suite
+npm start          # Run the production build
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Architecture
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```text
+src/
+├── app/
+│   ├── api/                  # REST-style route handlers
+│   ├── category/[slug]/      # Filtered marketplace pages
+│   ├── create/               # Listing creation flow
+│   └── item/[id]/            # Live listing details
+├── components/
+│   ├── layout/               # Header and sidebar
+│   ├── marketplace/          # Feature components
+│   └── ui/                   # Reusable primitives
+└── lib/                      # Supabase, API types, and utilities
+```
 
-## Deploy on Vercel
+## API summary
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/listings` | Search, filter, and paginate listings |
+| `POST` | `/api/listings` | Create a listing |
+| `GET` | `/api/listings/[id]` | Retrieve a listing |
+| `GET` | `/api/messages?listingId=` | Retrieve listing messages |
+| `POST` | `/api/messages` | Message a seller |
+| `POST` | `/api/upload` | Upload a validated listing image |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Documentation
+
+- [SETUP.md](./SETUP.md) — installation, Supabase, and deployment
+- [FEATURES.md](./FEATURES.md) — user-facing and technical features
+- [DEVELOPMENT_GUIDE.md](./DEVELOPMENT_GUIDE.md) — architecture and contribution workflow
+
+## Production status
+
+The project is production-buildable, but it remains a public marketplace demo. Before a real launch, add Supabase Authentication and replace the permissive message/listing RLS policies with user-scoped policies. See [SETUP.md](./SETUP.md).
