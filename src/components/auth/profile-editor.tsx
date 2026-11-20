@@ -2,10 +2,11 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
-import { Bookmark, CreditCard, LoaderCircle, MapPin, Package, Save, ShieldCheck } from "lucide-react";
+import { Bookmark, LoaderCircle, MapPin, Package, Save, ShieldCheck } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { DataResponse, ProfileRecord } from "@/lib/api-types";
+import { StripeConnectCard } from "@/components/payments/stripe-connect-card";
 
 type ProfileForm = Pick<ProfileRecord, "first_name" | "last_name" | "phone" | "location" | "bio">;
 const emptyProfile: ProfileForm = { first_name: "", last_name: "", phone: "", location: "", bio: "" };
@@ -79,7 +80,8 @@ export function ProfileEditor() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.45fr)_minmax(280px,0.75fr)]">
-        <section className="glass-panel rounded-[24px] p-6 sm:p-8">
+        <div className="space-y-6">
+          <section className="glass-panel rounded-[24px] p-6 sm:p-8">
           <div className="mb-7 flex items-center gap-4 border-b border-[#e8eaf1] pb-6">
             <div className="grid size-16 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#5b5cf0] to-[#22a9e8] text-xl font-semibold text-white">{initial}</div>
             <div className="min-w-0"><h2 className="truncate text-lg font-semibold">{fullName || "Your profile"}</h2><p className="truncate text-sm text-muted-foreground">{email || "Loading account…"}</p></div>
@@ -100,18 +102,15 @@ export function ProfileEditor() {
               <button disabled={saving} className="flex h-11 items-center justify-center gap-2 rounded-xl bg-[#111827] px-5 text-sm font-semibold text-white transition hover:bg-[#252d3c] disabled:opacity-60">{saving ? <LoaderCircle className="size-4 animate-spin" /> : <Save className="size-4" />}{saving ? "Saving…" : "Save changes"}</button>
             </form>
           )}
-        </section>
+          </section>
+
+          <StripeConnectCard />
+        </div>
 
         <aside className="space-y-6">
           <section className="glass-panel rounded-[24px] p-3">
             <Link href="/my-listings" className="flex items-center gap-3 rounded-2xl p-3 text-sm font-semibold text-[#30364a] transition hover:bg-[#f4f5fa]"><span className="grid size-10 place-items-center rounded-xl bg-[#eef0ff] text-[#5b5cf0]"><Package className="size-5" /></span><span>My listings<span className="mt-0.5 block text-xs font-normal text-muted-foreground">Manage items you are selling</span></span></Link>
             <Link href="/saved" className="flex items-center gap-3 rounded-2xl p-3 text-sm font-semibold text-[#30364a] transition hover:bg-[#f4f5fa]"><span className="grid size-10 place-items-center rounded-xl bg-[#eef8fc] text-[#1689b8]"><Bookmark className="size-5" /></span><span>Saved listings<span className="mt-0.5 block text-xs font-normal text-muted-foreground">View your bookmarked items</span></span></Link>
-          </section>
-          <section className="glass-panel rounded-[24px] p-6">
-            <div className="flex items-start justify-between gap-4"><span className="grid size-11 place-items-center rounded-xl bg-[#eef0ff] text-[#5b5cf0]"><CreditCard className="size-5" /></span><span className="rounded-full bg-[#f0f2f8] px-2.5 py-1 text-[10px] font-semibold tracking-[0.12em] text-[#646b7d] uppercase">Coming soon</span></div>
-            <h2 className="mt-5 text-lg font-semibold">Payments</h2>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">Stripe payments will be connected here later. No card or bank information is collected yet.</p>
-            <button type="button" disabled className="mt-5 h-10 w-full rounded-xl border border-[#dfe2ea] bg-[#f5f6f9] text-sm font-semibold text-[#9aa0ae]">Set up Stripe</button>
           </section>
           <section className="rounded-[20px] border border-emerald-100 bg-emerald-50/70 p-5"><div className="flex items-center gap-2 text-sm font-semibold text-emerald-800"><ShieldCheck className="size-4" />Private account data</div><p className="mt-2 text-xs leading-5 text-emerald-700">Only you can read or update this profile through database security policies.</p></section>
         </aside>

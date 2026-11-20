@@ -11,7 +11,7 @@ export async function GET(request: Request) {
   const idsOnly = params.get("idsOnly") === "true";
   if (listingId && !isUuid(listingId)) return apiError("INVALID_QUERY", "listing_id must be a valid UUID.", 400);
 
-  let query = supabase.from("saved_listings").select("listing_id,listing:listings(id,title,description,price,category,seller_email,owner_id,image_url,location,created_at,updated_at)").eq("user_id", claims.sub).order("created_at", { ascending: false });
+  let query = supabase.from("saved_listings").select("listing_id,listing:listings(id,title,description,price,category,seller_email,owner_id,image_url,location,status,sold_at,created_at,updated_at)").eq("user_id", claims.sub).order("created_at", { ascending: false });
   if (listingId) query = query.eq("listing_id", listingId);
   const { data, error } = await query;
   if (error) return databaseError(error, "Saved listings could not be loaded.");

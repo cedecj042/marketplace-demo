@@ -2,7 +2,7 @@ import { apiError, databaseError } from "@/lib/api";
 import type { DataResponse, ListingRecord } from "@/lib/api-types";
 import { requireClaims } from "@/lib/supabase-server";
 
-const listingColumns = "id,title,description,price,category,seller_email,owner_id,image_url,location,created_at,updated_at";
+const listingColumns = "id,title,description,price,category,seller_email,owner_id,image_url,location,status,sold_at,created_at,updated_at";
 
 export async function GET() {
   const { supabase, claims } = await requireClaims();
