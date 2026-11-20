@@ -12,6 +12,17 @@ export type ChatMessageRecord = {
   id: string; conversation_id: string; sender_id: string; body: string; created_at: string;
 };
 
+export type NotificationRecord = {
+  id: string;
+  user_id: string;
+  type: string;
+  title: string;
+  body: string;
+  href: string;
+  read_at: string | null;
+  created_at: string;
+};
+
 export type ProfileRecord = {
   id: string;
   email: string;
