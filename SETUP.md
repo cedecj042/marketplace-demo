@@ -12,15 +12,24 @@ This repository uses Next.js 16.4.6 and stable Tailwind CSS 4.3.3. Do not downgr
 
 ```bash
 npm install
-cp .env.example .env.local
+cp .env.example .env
 ```
 
-Configure `.env.local`:
+Configure `.env`:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
+SUPABASE_SERVICE_ROLE_KEY=your-server-only-service-role-key
+
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_CONNECT_COUNTRY=US
 ```
+
+`SUPABASE_SERVICE_ROLE_KEY`, `STRIPE_SECRET_KEY`, and `STRIPE_WEBHOOK_SECRET` are server-only secrets. Never prefix them with `NEXT_PUBLIC_`, expose them to browser code, or commit them.
 
 The application intentionally has no placeholder credentials. Missing configuration should fail clearly instead of silently contacting a fake backend.
 
@@ -37,6 +46,13 @@ The application expects:
 Run the project schema in Supabase SQL Editor and confirm the bucket name is exactly `listing-images`.
 
 Then run [`supabase/migrations/20261119_auth_realtime_chat.sql`](./supabase/migrations/20261119_auth_realtime_chat.sql). It adds listing ownership, conversations, participant-scoped chat messages, secure image paths, and the Realtime publication.
+
+Run the remaining migrations in this order:
+
+1. [`supabase/migrations/20261120_user_profiles.sql`](./supabase/migrations/20261120_user_profiles.sql)
+2. [`supabase/migrations/20261120_saved_listings.sql`](./supabase/migrations/20261120_saved_listings.sql)
+3. [`supabase/migrations/20261120_notifications.sql`](./supabase/migrations/20261120_notifications.sql)
+4. [`supabase/migrations/20261120_stripe_connect.sql`](./supabase/migrations/20261120_stripe_connect.sql)
 
 In Supabase Auth URL Configuration, add your local and deployed `/auth/confirm` URLs to the redirect allow list.
 
@@ -84,9 +100,19 @@ This runs ESLint, TypeScript, and the optimized production build.
 ## Deployment
 
 1. Create a Vercel project from the repository.
-2. Add both Supabase environment variables.
-3. Deploy and test listing creation, images, search, categories, and messaging.
-4. Confirm Storage public URLs render through `next/image`.
+2. Add every variable from `.env.example` to Vercel. Use the production URL for `NEXT_PUBLIC_SITE_URL`.
+3. Deploy to the production domain.
+4. Register the production Connect webhook once:
+
+   ```bash
+   npm run stripe:webhook
+   ```
+
+5. Copy the printed `whsec_...` value into `STRIPE_WEBHOOK_SECRET` locally and in Vercel, then redeploy.
+6. Test seller onboarding, Checkout with Stripe's `4242 4242 4242 4242` test card, order confirmation, and the sold state.
+7. Confirm Storage public URLs render through `next/image`.
+
+The webhook registration script rejects localhost and expects the public production HTTPS URL. It creates a Connect webhook for `checkout.session.completed` and `account.updated`. The shared Stripe sandbox can send events for other candidates; the handler ignores sessions and accounts that do not match this application's orders and profiles.
 
 Do not add fake fallback environment values. They make builds appear healthy while leaving runtime operations broken.
 

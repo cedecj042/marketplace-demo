@@ -1,6 +1,6 @@
 export type ListingRecord = {
   id: string; title: string; description: string | null; price: number; category: string;
-  seller_email: string; owner_id: string | null; image_url: string | null; location: string; created_at: string; updated_at: string;
+  seller_email: string; owner_id: string | null; image_url: string | null; location: string; status: "active" | "sold"; sold_at: string | null; created_at: string; updated_at: string;
 };
 
 export type ConversationRecord = {

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MessageCircle, Orbit } from "lucide-react";
+import { Orbit } from "lucide-react";
 import { AccountMenu } from "@/components/auth/account-menu";
 import { MobileMenu } from "@/components/layout/mobile-menu";
 import { NotificationCenter } from "@/components/notifications/notification-center";
@@ -12,7 +12,6 @@ export function Header() {
       <span className="hidden text-lg font-semibold tracking-[-0.02em] text-[#202337] min-[390px]:inline">Marketplace</span>
     </Link>
     <div className="ml-auto flex items-center gap-2">
-      <Link href="/messages" aria-label="Messages" title="Messages" className="grid size-10 place-items-center rounded-xl border border-[#e3e6ef] bg-white/70 text-[#475569] transition hover:border-[#cfd3e3] hover:bg-white"><MessageCircle className="size-[18px]" /></Link>
       <NotificationCenter />
       <AccountMenu />
     </div>

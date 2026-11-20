@@ -1,6 +1,6 @@
 # Marketplace Demo
 
-A minimalist local marketplace built with Next.js, React, TypeScript, Tailwind CSS, and Supabase. It supports browsing live listings, secure user accounts, image uploads, item details, and real-time buyer/seller chat.
+A minimalist local marketplace built with Next.js, React, TypeScript, Tailwind CSS, Supabase, and Stripe Connect. It supports live listings, secure user accounts, saved items, real-time chat and notifications, seller onboarding, Checkout, marketplace fees, and sold orders.
 
 ## Technology
 
@@ -8,6 +8,7 @@ A minimalist local marketplace built with Next.js, React, TypeScript, Tailwind C
 - React 19 and TypeScript
 - Tailwind CSS 4
 - Supabase Database and Storage
+- Stripe Connect and Stripe Checkout in sandbox mode
 - Base UI/Shadcn-style primitives
 - IBM Plex Sans through `next/font`
 - Lucide icons
@@ -16,11 +17,11 @@ A minimalist local marketplace built with Next.js, React, TypeScript, Tailwind C
 
 ```bash
 npm install
-cp .env.example .env.local
+cp .env.example .env
 npm run dev
 ```
 
-Add your Supabase project URL and publishable key to `.env.local`, then open [http://localhost:3000](http://localhost:3000).
+Add your Supabase project URL and publishable key to `.env`, then open [http://localhost:3000](http://localhost:3000).
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
@@ -65,6 +66,11 @@ src/
 | `GET` | `/api/listings/[id]` | Retrieve a listing |
 | `GET/POST` | `/api/conversations` | Open and list account conversations |
 | `GET/POST` | `/api/messages?conversationId=` | Read and send chat messages |
+| `GET/PATCH` | `/api/notifications` | Read and update in-app notifications |
+| `GET/POST` | `/api/stripe/connect` | Sync or start seller onboarding |
+| `GET/POST` | `/api/stripe/checkout` | Check eligibility or create Checkout |
+| `POST` | `/api/stripe/webhook` | Verify and fulfill Stripe events |
+| `GET` | `/api/orders/status` | Read Checkout confirmation status |
 | `POST` | `/api/upload` | Upload a validated listing image |
 
 ## Documentation
@@ -75,4 +81,4 @@ src/
 
 ## Production status
 
-The project includes Supabase Authentication and participant-scoped chat RLS. Before a real launch, add rate limiting, moderation, automated browser tests, account recovery UI, and production monitoring. See [SETUP.md](./SETUP.md).
+The project includes Supabase Authentication, participant-scoped RLS, and sandbox Stripe payments. Before a real-money launch, complete Stripe production verification and compliance, add rate limiting, moderation, automated browser tests, account recovery UI, refunds/disputes, tax handling, and production monitoring. See [SETUP.md](./SETUP.md).
