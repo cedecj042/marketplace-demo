@@ -15,10 +15,12 @@ MarketplaceBrowser ──GET──> /api/listings ──> Supabase listings
 CreateListingForm ──POST──> /api/upload ────> Supabase Storage
 CreateListingForm ──POST──> /api/listings ──> Supabase listings
 ItemDetailClient ───GET───> /api/listings/id
-MessageSellerForm ──POST──> /api/messages ──> Supabase messages
+ListingChatLauncher ─POST─> /api/conversations ─> Supabase conversations
+RealtimeChat ─────GET/POST> /api/messages ──────> Supabase chat_messages
+RealtimeChat ──WebSocket─> Supabase Realtime inserts
 ```
 
-The browser receives no secret credential. The publishable key is public by design, so authorization must be enforced by RLS.
+The browser receives no secret credential. The publishable key is public by design, so authorization is enforced by user-scoped RLS. Chat clients subscribe to `chat_messages` inserts filtered by conversation ID.
 
 ## Organization
 
@@ -69,4 +71,4 @@ Tailwind CSS 4 is compiled through the installed Turbopack integration. Design t
 
 ## Roadmap
 
-Immediate priorities are authentication, user-scoped RLS, richer filters, and notification delivery. Future options include real-time chat, payments, maps, push notifications, and an admin dashboard.
+Immediate priorities are account recovery, richer filters, moderation, and notification delivery. Future options include payments, maps, push notifications, and an admin dashboard.

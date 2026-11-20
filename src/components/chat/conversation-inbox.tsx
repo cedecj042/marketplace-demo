@@ -1,0 +1,15 @@
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { MessageCircle } from "lucide-react";
+import type { ConversationRecord } from "@/lib/api-types";
+
+export function ConversationInbox({ userId }: { userId: string }) {
+  const [items, setItems] = useState<ConversationRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  useEffect(() => { const controller = new AbortController(); fetch("/api/conversations", { signal: controller.signal }).then(async (response) => { const payload = await response.json() as { data?: ConversationRecord[]; error?: { message?: string } }; if (!response.ok || !payload.data) throw new Error(payload.error?.message ?? "Conversations could not be loaded."); setItems(payload.data); }).catch((reason) => { if (!(reason instanceof DOMException && reason.name === "AbortError")) setError(reason instanceof Error ? reason.message : "Conversations could not be loaded."); }).finally(() => { if (!controller.signal.aborted) setLoading(false); }); return () => controller.abort(); }, []);
+  return <main className="mx-auto min-h-[calc(100vh-4.5rem)] max-w-4xl px-4 py-10 sm:px-6"><p className="text-[10px] font-semibold tracking-[0.18em] text-[#6465dc] uppercase">Your account</p><h1 className="mt-2 text-4xl font-semibold tracking-[-0.04em]">Messages</h1><p className="mt-2 text-sm text-muted-foreground">Conversations with buyers and sellers update in real time.</p><div className="glass-panel mt-8 overflow-hidden rounded-[22px]">{loading ? <div className="p-12 text-center text-sm text-muted-foreground">Loading conversations…</div> : error ? <div className="p-12 text-center text-sm text-destructive">{error}</div> : items.length ? items.map((item) => { const counterpart = userId === item.buyer_id ? item.seller_email : item.buyer_email; return <Link key={item.id} href={`/messages/${item.id}`} className="flex items-center gap-4 border-b border-[#e8eaf0] p-4 transition last:border-0 hover:bg-white/70"><div className="relative grid size-14 shrink-0 place-items-center overflow-hidden rounded-2xl bg-[#eeefff] text-[#5b5cf0]">{item.listing?.image_url ? <Image src={item.listing.image_url} alt="" fill className="object-cover" /> : <MessageCircle className="size-5" />}</div><div className="min-w-0 flex-1"><p className="truncate font-semibold">{item.listing?.title ?? "Marketplace listing"}</p><p className="truncate text-sm text-muted-foreground">Chat with {counterpart}</p></div><time className="text-xs text-muted-foreground">{new Intl.DateTimeFormat("en", { month: "short", day: "numeric" }).format(new Date(item.last_message_at))}</time></Link>; }) : <div className="p-12 text-center"><MessageCircle className="mx-auto size-8 text-muted-foreground" /><h2 className="mt-3 font-semibold">No conversations yet</h2><p className="mt-1 text-sm text-muted-foreground">Open a listing and start a chat with its seller.</p></div>}</div></main>;
+}

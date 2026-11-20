@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Car, ChevronRight, Home, LayoutGrid, Plus, Shirt, Smartphone, Sparkles, Tag, ToyBrick } from "lucide-react";
+import { Bookmark, Car, ChevronRight, Home, LayoutGrid, Package, Plus, Shirt, Smartphone, Sparkles, Tag, ToyBrick } from "lucide-react";
 import { SearchForm } from "@/components/marketplace/search-form";
 import { categories } from "@/lib/marketplace-data";
 
@@ -12,6 +12,10 @@ export function Sidebar() {
     <nav className="space-y-1">
       <Link href="/" className="flex items-center gap-3 rounded-xl bg-[#111827] p-2 font-medium text-white shadow-[0_12px_24px_-16px_#111827]"><span className="grid size-9 place-items-center rounded-lg bg-white/10"><LayoutGrid className="size-[18px]" /></span>Browse all</Link>
       <Link href="/create" className="mb-4 mt-2 flex h-10 items-center justify-center gap-2 rounded-xl border border-[#dfe2ff] bg-[#f0f0ff] text-sm font-semibold text-[#5051d9] transition hover:border-[#bfc0ff] hover:bg-[#e9e9ff]"><Plus className="size-4" /> Create listing</Link>
+      <div className="mb-4 space-y-1 border-t border-[#eceef3] pt-4">
+        <Link href="/my-listings" className="flex items-center gap-3 rounded-xl p-2 text-sm font-medium text-[#4b5565] transition hover:bg-white hover:text-[#22243a]"><span className="grid size-9 place-items-center rounded-lg bg-[#f1f3f7] text-[#6b7280]"><Package className="size-[17px]" /></span>My listings</Link>
+        <Link href="/saved" className="flex items-center gap-3 rounded-xl p-2 text-sm font-medium text-[#4b5565] transition hover:bg-white hover:text-[#22243a]"><span className="grid size-9 place-items-center rounded-lg bg-[#f1f3f7] text-[#6b7280]"><Bookmark className="size-[17px]" /></span>Saved listings</Link>
+      </div>
       <div className="border-t border-[#eceef3] pt-4"><div className="mb-2 flex items-center justify-between px-2"><h3 className="text-xs font-semibold tracking-[0.12em] text-[#7c8194] uppercase">Categories</h3><ChevronRight className="size-4 text-[#a2a8b7]" /></div>
         {categories.map(({ slug, label }) => { const Icon = icons[slug as keyof typeof icons]; return <Link key={slug} href={`/category/${slug}`} className="flex items-center gap-3 rounded-xl p-2 text-sm font-medium text-[#4b5565] transition hover:bg-white hover:text-[#22243a]"><span className="grid size-9 place-items-center rounded-lg bg-[#f1f3f7] text-[#6b7280]"><Icon className="size-[17px]" /></span>{label}</Link>; })}
       </div>

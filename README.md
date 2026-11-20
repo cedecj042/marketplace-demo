@@ -1,6 +1,6 @@
 # Marketplace Demo
 
-A minimalist local marketplace built with Next.js, React, TypeScript, Tailwind CSS, and Supabase. It supports browsing and searching live listings, category filters, image uploads, item details, and seller messaging.
+A minimalist local marketplace built with Next.js, React, TypeScript, Tailwind CSS, and Supabase. It supports browsing live listings, secure user accounts, image uploads, item details, and real-time buyer/seller chat.
 
 ## Technology
 
@@ -63,8 +63,8 @@ src/
 | `GET` | `/api/listings` | Search, filter, and paginate listings |
 | `POST` | `/api/listings` | Create a listing |
 | `GET` | `/api/listings/[id]` | Retrieve a listing |
-| `GET` | `/api/messages?listingId=` | Retrieve listing messages |
-| `POST` | `/api/messages` | Message a seller |
+| `GET/POST` | `/api/conversations` | Open and list account conversations |
+| `GET/POST` | `/api/messages?conversationId=` | Read and send chat messages |
 | `POST` | `/api/upload` | Upload a validated listing image |
 
 ## Documentation
@@ -75,4 +75,4 @@ src/
 
 ## Production status
 
-The project is production-buildable, but it remains a public marketplace demo. Before a real launch, add Supabase Authentication and replace the permissive message/listing RLS policies with user-scoped policies. See [SETUP.md](./SETUP.md).
+The project includes Supabase Authentication and participant-scoped chat RLS. Before a real launch, add rate limiting, moderation, automated browser tests, account recovery UI, and production monitoring. See [SETUP.md](./SETUP.md).

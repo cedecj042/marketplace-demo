@@ -27,10 +27,13 @@ The schema currently has no `condition` column, so condition remains preview-onl
 - Responsive media presentation
 - Price, description, location, date, and seller information
 - Missing-listing and retry interface
-- Buyer email and message validation
-- Pending, error, and success feedback
+- Email/password accounts with cookie-backed sessions
+- Account-owned listings and image uploads
+- Participant-only conversation history
+- Real-time message delivery through Supabase Realtime
+- Buyer/seller inbox with pending, error, and empty states
 
-Save/share are currently visual controls, and messaging is asynchronous rather than real-time chat.
+Save/share remain visual controls.
 
 ## API behavior
 
@@ -46,10 +49,9 @@ Listings accept `search`, `category`, `minPrice`, `maxPrice`, `limit`, and `offs
 
 ## Roadmap
 
-- Supabase Authentication and user profiles
+- User profiles, recovery, and optional MFA
 - User-owned listings and favorites
 - Advanced filters and sorting
-- Real-time chat
 - Email and push notifications
 - Maps and distance discovery
 - Stripe payments

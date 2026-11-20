@@ -29,12 +29,16 @@ The application intentionally has no placeholder credentials. Missing configurat
 The application expects:
 
 - A `listings` table with UUID `id`, listing fields, seller email, image URL, location, and timestamps
-- A `messages` table linked to `listings.id`
+- The original `messages` table from the base schema (kept only for migration compatibility)
 - A public Storage bucket named `listing-images`
 - `SELECT` and `INSERT` RLS policies for the public demo
-- Indexes on listing category, creation time, and message listing ID
+- Indexes on listing category, creation time, ownership, conversations, and chat messages
 
 Run the project schema in Supabase SQL Editor and confirm the bucket name is exactly `listing-images`.
+
+Then run [`supabase/migrations/20261119_auth_realtime_chat.sql`](./supabase/migrations/20261119_auth_realtime_chat.sql). It adds listing ownership, conversations, participant-scoped chat messages, secure image paths, and the Realtime publication.
+
+In Supabase Auth URL Configuration, add your local and deployed `/auth/confirm` URLs to the redirect allow list.
 
 ### Storage policies
 
@@ -42,13 +46,13 @@ Uploads require an `INSERT` policy on `storage.objects`; public image delivery r
 
 ### Security warning
 
-The demo schema allows anonymous listing creation and message access. Before a real launch:
+The account migration removes anonymous writes and protects conversations by participant. Before a real launch:
 
-1. Enable Supabase Authentication.
-2. Add immutable owner IDs to listings and messages.
-3. Restrict message reads to the buyer and seller.
-4. Restrict listing changes and storage writes to the owner.
-5. Add abuse prevention and rate limiting.
+1. Configure password policy, recovery, and optional MFA.
+2. Add abuse prevention and rate limiting.
+3. Add moderation and account reporting.
+4. Configure transactional email delivery.
+5. Add monitoring and audit retention.
 
 ## Development
 
@@ -105,4 +109,4 @@ The handler converts the Web `File` to an `ArrayBuffer` for consistent Node and 
 
 Implemented: TypeScript, ESLint, production build, request validation, parameterized Supabase queries, image validation, responsive UI, loading/error states, and optimized images.
 
-Still required for a real launch: authentication, user-scoped RLS, rate limits, private-message authorization, automated browser tests, error monitoring, and notification delivery.
+Still required for a real launch: rate limits, recovery/MFA UX, moderation, automated browser tests, error monitoring, and notification delivery.
