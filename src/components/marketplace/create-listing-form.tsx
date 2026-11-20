@@ -9,9 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { categories, formatPrice } from "@/lib/marketplace-data";
 
-type Preview = { title: string; price: string; category: string; condition: string; description: string; location: string; sellerEmail: string };
-type FormErrors = Partial<Record<"title" | "price" | "category" | "sellerEmail" | "image", string>>;
-const emptyListing: Preview = { title: "", price: "", category: "", condition: "", description: "", location: "Palo Alto, CA", sellerEmail: "" };
+type Preview = { title: string; price: string; category: string; condition: string; description: string; location: string };
+type FormErrors = Partial<Record<"title" | "price" | "category" | "image", string>>;
+const emptyListing: Preview = { title: "", price: "", category: "", condition: "", description: "", location: "Palo Alto, CA" };
 
 export function CreateListingForm() {
   const router = useRouter();
@@ -40,9 +40,9 @@ export function CreateListingForm() {
         if (!response.ok || !payload.data) { setErrors({ image: payload.error?.fields?.image }); throw new Error(payload.error?.message ?? "Photo upload failed."); }
         imageUrl = payload.data.url;
       }
-      const response = await fetch("/api/listings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title: preview.title, price: Number(preview.price), category: preview.category, description: preview.description, location: preview.location, seller_email: preview.sellerEmail, image_url: imageUrl }) });
+      const response = await fetch("/api/listings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title: preview.title, price: Number(preview.price), category: preview.category, description: preview.description, location: preview.location, image_url: imageUrl }) });
       const payload = await response.json() as { data?: { id: string }; error?: { message?: string; fields?: Record<string, string> } };
-      if (!response.ok || !payload.data) { const fields = payload.error?.fields ?? {}; setErrors({ title: fields.title, price: fields.price, category: fields.category, sellerEmail: fields.seller_email }); throw new Error(payload.error?.message ?? "Listing could not be published."); }
+      if (!response.ok || !payload.data) { const fields = payload.error?.fields ?? {}; setErrors({ title: fields.title, price: fields.price, category: fields.category }); throw new Error(payload.error?.message ?? "Listing could not be published."); }
       setStatus({ message: "Listing published. Opening it now…", success: true });
       if (imagePreview) URL.revokeObjectURL(imagePreview);
       setImagePreview("");
@@ -67,8 +67,7 @@ export function CreateListingForm() {
         <Field label="Condition"><select value={preview.condition} onChange={update("condition")} className="mt-2 h-11 w-full rounded-lg border border-input bg-white px-3 text-sm outline-none"><option value="">Select condition</option><option>New</option><option>Like new</option><option>Good</option><option>Fair</option></select></Field>
         <Field label="Description"><Textarea value={preview.description} onChange={update("description")} className="mt-2 min-h-28" placeholder="Tell buyers about your item" /></Field>
         <Field label="Location"><Input value={preview.location} onChange={update("location")} className="mt-2 h-11" required /></Field>
-        <Field label="Seller email" error={errors.sellerEmail}><Input type="email" value={preview.sellerEmail} onChange={update("sellerEmail")} className="mt-2 h-11" placeholder="you@example.com" required aria-invalid={!!errors.sellerEmail} /></Field>
-        <div className="flex gap-2 rounded-lg bg-[#f0f2f5] p-3 text-xs leading-5 text-muted-foreground"><Info className="mt-0.5 size-4 shrink-0" />Your email is used so interested buyers can contact you.</div>
+        <div className="flex gap-2 rounded-lg bg-[#f0f2f5] p-3 text-xs leading-5 text-muted-foreground"><Info className="mt-0.5 size-4 shrink-0" />This listing will be linked to your signed-in account.</div>
         {status.message && <p role="status" aria-live="polite" className={`flex items-center gap-2 rounded-lg p-3 text-sm ${status.success ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-destructive"}`}>{status.success && <CheckCircle2 className="size-4" />}{status.message}</p>}
         <Button type="submit" disabled={pending} className="h-11 w-full rounded-xl bg-[#111827] shadow-[0_14px_25px_-16px_#111827] hover:bg-[#252d3c]">{pending ? <><LoaderCircle className="animate-spin" /> Publishing…</> : "Publish listing"}</Button>
       </form>

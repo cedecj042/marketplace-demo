@@ -1,8 +1,9 @@
-import { apiError, databaseError, emailPattern, isRecord, parsePositiveInteger, readJson } from "@/lib/api";
+import { apiError, databaseError, isRecord, parsePositiveInteger, readJson } from "@/lib/api";
 import type { DataResponse, ListingRecord, PaginatedResponse } from "@/lib/api-types";
 import { createSupabaseClient } from "@/lib/supabase";
+import { requireClaims } from "@/lib/supabase-server";
 
-const listingColumns = "id,title,description,price,category,seller_email,image_url,location,created_at,updated_at";
+const listingColumns = "id,title,description,price,category,seller_email,owner_id,image_url,location,status,sold_at,created_at,updated_at";
 
 export async function GET(request: Request) {
   const params = new URL(request.url).searchParams;
@@ -32,13 +33,16 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const { supabase, claims } = await requireClaims();
+  if (!claims) return apiError("UNAUTHORIZED", "Sign in to create a listing.", 401);
+  const sellerEmail = typeof claims.email === "string" ? claims.email.toLowerCase() : "";
+  if (!sellerEmail) return apiError("ACCOUNT_EMAIL_REQUIRED", "Your account needs a verified email address.", 403);
   const parsed = await readJson(request); if (parsed.response) return parsed.response;
   if (!isRecord(parsed.value)) return apiError("VALIDATION_ERROR", "Request body must be a JSON object.", 422);
   const body = parsed.value;
   const title = typeof body.title === "string" ? body.title.trim() : "";
   const description = typeof body.description === "string" ? body.description.trim() : "";
   const category = typeof body.category === "string" ? body.category.trim() : "";
-  const sellerEmail = typeof body.seller_email === "string" ? body.seller_email.trim().toLowerCase() : "";
   const location = typeof body.location === "string" ? body.location.trim() : "Palo Alto, CA";
   const imageUrl = typeof body.image_url === "string" && body.image_url.trim() ? body.image_url.trim() : null;
   const price = typeof body.price === "number" ? body.price : Number(body.price);
@@ -47,13 +51,12 @@ export async function POST(request: Request) {
   if (title.length < 3 || title.length > 255) fields.title = "Must be between 3 and 255 characters.";
   if (!Number.isFinite(price) || price <= 0 || price > 99_999_999.99) fields.price = "Must be greater than 0 and no more than 99999999.99.";
   if (!category || category.length > 100) fields.category = "Must be between 1 and 100 characters.";
-  if (!emailPattern.test(sellerEmail) || sellerEmail.length > 255) fields.seller_email = "Must be a valid email address.";
   if (description.length > 10_000) fields.description = "Cannot exceed 10000 characters.";
   if (!location || location.length > 255) fields.location = "Must be between 1 and 255 characters.";
   if (imageUrl && (!isHttpUrl(imageUrl) || imageUrl.length > 2048)) fields.image_url = "Must be a valid HTTP or HTTPS URL.";
   if (Object.keys(fields).length) return apiError("VALIDATION_ERROR", "One or more fields are invalid.", 422, fields);
 
-  const { data, error } = await createSupabaseClient().from("listings").insert({ title, description: description || null, price, category, seller_email: sellerEmail, image_url: imageUrl, location }).select(listingColumns).single();
+  const { data, error } = await supabase.from("listings").insert({ title, description: description || null, price, category, seller_email: sellerEmail, owner_id: claims.sub, image_url: imageUrl, location }).select(listingColumns).single();
   if (error) return databaseError(error, "Listing could not be created.");
   return Response.json({ data: data as ListingRecord } satisfies DataResponse<ListingRecord>, { status: 201, headers: { Location: `/api/listings/${data.id}` } });
 }
